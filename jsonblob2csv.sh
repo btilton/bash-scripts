@@ -7,6 +7,10 @@
 
 echo -n '{"user": {"name":' > agorablob.fixed &&
 
+# The sed substitution in the middle of this line is for BSD based systems and
+#   may need to be changed for other unix systems specifiaclly the \\\n and
+#   putting the substitution formula inside of $'' should not be necessary on
+#   normal linux systems
 sed "s/: {/, /g" agorablob.json | sed $'s/}, /}}\\\n{"user": {"name": /g' >> agorablob.fixed &&
 
 sed -i '' 's/:{/: /g' agorablob.fixed &&
