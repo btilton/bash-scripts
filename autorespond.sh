@@ -14,8 +14,7 @@ end_date=`date -v+50y +%Y-%m-%d` #End date for vacation message. 50 years from n
 usermail=''
 
 #print usage function
-# STUB PLACEHOLDER
-function usage(){
+function usage {
   echo "Usage: autorespond.sh [-s subject] [-m message] [user_email_address]"
   echo "       autorespond.sh [-h]"
   exit 1
@@ -31,23 +30,30 @@ while getopts 's:m:h' flag; do
   case ${flag} in
     s ) subject="${OPTARG}" ;;
     m ) message="${OPTARG}" ;;
-    h ) usage() ;;
+    h ) usage ;;
     * ) error "Unexpected option ${flag}"
-        usage()
+        usage
         ;;
   esac
 done
 
 usermail=$1
-if [$usermail = '']; do
-  usage()
-done
+if [$usermail = '']; then
+  usage
+fi
 
-echo $1
-echo $usermail
+#Check if user exists
+userexists=`$gam user info $usermail | sed -n 1p | awk '{print $1;}' | cut -d: -f 1`
 
-#$gam update user $usermail suspended off &&
-#
-#$gam user $usermail vacation on subject "$subject" message "$message" startdate $start_date enddate $end_date &&
-#
-#$gam user $usermail show vacation
+if [[ $userexists == Error ]]; then
+  echo "User does not exist in Google Apps"
+  exit 1
+fi
+
+if [[ $userexists == User ]]; then
+  $gam update user $usermail suspended off &&
+
+  $gam user $usermail vacation on subject "$subject" message "$message" startdate $start_date enddate $end_date &&
+
+  $gam user $usermail show vacation
+fi
