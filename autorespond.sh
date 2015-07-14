@@ -7,26 +7,47 @@
 #       :   set a 50 year away message using GAM
 #################
 
-# Change this to location of your gam.py
-gam="python $HOME/gam/gam.py"
-
-# Print usage
-if [ -z "$*" ]; then
-    echo 'usage: vacation.sh [user_email_address] [subject] [message]'
-    exit 0
-fi
-
-# Set input variables
-user=$1
-subject=$2
-message=$3
-
+# Set Date Variables
 start_date=`date +%Y-%m-%d` #Start date for vacation message in correct format
-
 end_date=`date -v+50y +%Y-%m-%d` #End date for vacation message. 50 years from now
 
-$gam update user $1 suspended off &&
+usermail=''
 
-$gam user $user vacation on subject "$subject" message "$message" startdate $start_date enddate $end_date &&
+#print usage function
+# STUB PLACEHOLDER
+function usage(){
+  echo "Usage: autorespond.sh [-s subject] [-m message] [user_email_address]"
+  echo "       autorespond.sh [-h]"
+  exit 1
+}
 
-$gam user $user show vacation
+#Default subject and message variable contents
+subject="Thank you for your message"
+message="Thank you for your email. The owner of this email address no longer works for Upwork."
+
+##### MAIN
+
+while getopts 's:m:h' flag; do
+  case ${flag} in
+    s ) subject="${OPTARG}" ;;
+    m ) message="${OPTARG}" ;;
+    h ) usage() ;;
+    * ) error "Unexpected option ${flag}"
+        usage()
+        ;;
+  esac
+done
+
+usermail=$1
+if [$usermail = '']; do
+  usage()
+done
+
+echo $1
+echo $usermail
+
+#$gam update user $usermail suspended off &&
+#
+#$gam user $usermail vacation on subject "$subject" message "$message" startdate $start_date enddate $end_date &&
+#
+#$gam user $usermail show vacation
